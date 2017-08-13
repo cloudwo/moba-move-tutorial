@@ -1,34 +1,40 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-/* Copyright (C) Xenfinity LLC - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Bilal Itani <bilalitani1@gmail.com>, June 2017
- */
+using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour {
 
-    public float speed;
+    Camera cam;
 
-    private Rigidbody rb;
+    public LayerMask groundLayer;
 
-    #region Monobehaviour API
+    public NavMeshAgent playerAgent;
 
-    void Start () {
-        rb = GetComponent<Rigidbody>();
+	// Use this for initialization
+	void Awake () 
+    {
+        cam = Camera.main;	
+	}
+	
+	// Update is called once per frame
+	void Update () 
+    {
+        if (Input.GetMouseButtonDown(1)) 
+        {
+            playerAgent.SetDestination(GetPointUnderCursor());
+        }
 	}
 
-	void Update ()
+    private Vector3 GetPointUnderCursor() 
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        Vector2 screenPosition = Input.mousePosition;
+        Vector3 mouseWorldPosition = cam.ScreenToWorldPoint(screenPosition);
 
-        Vector3 movement = new Vector3(moveHorizontal, 0, moveVertical);
+        RaycastHit hitPosition;
 
-        rb.AddForce(movement * speed);
+        Physics.Raycast(mouseWorldPosition, cam.transform.forward, out hitPosition, 100, groundLayer);
+
+        return hitPosition.point;
     }
-
-    #endregion
 }
